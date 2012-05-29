@@ -4,7 +4,7 @@ RFC_XML=   draft-banks-imap-conversations.xml
 XML2RFC_DIR=    /home/gnb/software/xml2rfc-1.36
 XML2RFC=	tclsh $(XML2RFC_DIR)/xml2rfc.tcl
 
-all: validate $(RFC_XML:.xml=.txt) $(RFC_XML:.xml=.html)
+all: $(RFC_XML:.xml=.txt) $(RFC_XML:.xml=.html)
 
 validate:
 	@for rfc in $(RFC_XML) ; do \

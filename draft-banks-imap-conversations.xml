@@ -1,20 +1,5 @@
 <?xml version="1.0" encoding="US-ASCII"?>
-<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
-<!-- One method to get references from the online citation libraries.
-     There has to be one entity for each item to be referenced. 
-     An alternate method (rfc include) is described in the references. -->
-
-<!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
-<!ENTITY RFC2629 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2629.xml">
-<!ENTITY RFC3501 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3501.xml">
-<!ENTITY RFC3552 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3552.xml">
-<!ENTITY RFC4234 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.4234.xml">
-<!ENTITY RFC4466 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.4466.xml">
-<!ENTITY RFC4551 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.4551.xml">
-<!ENTITY RFC5226 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.5226.xml">
-<!ENTITY RFC5256 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.5256.xml">
-<!ENTITY RFC5322 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.5322.xml">
-]>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [ ]>
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 <!-- used by XSLT processors -->
 <!-- For a complete list and description of processing instructions (PIs), 
@@ -372,7 +357,7 @@ Subject: Re: Re: Hello World
       <section anchor="MOVE" title="Interaction with MOVE">
 
 	<t>A server MAY implement both this extension and the MOVE
-	extension <xref target="draft-MOVE" />.</t>
+	extension <xref target="I-D.krecicki-imap-move"/>.</t>
 
 	<t>When a message is moved from one folder to another folder in
 	the same conversation scope using the MOVE command, the server
@@ -498,80 +483,38 @@ command-select =/ convsort / convupdates
   <back>
     <!-- References split into informative and normative -->
 
-    <!-- There are 2 ways to insert reference entries from the citation libraries:
-     1. define an ENTITY at the top, and use "ampersand character"RFC2629; here (as shown)
-     2. simply use a PI "less than character"?rfc include="reference.RFC.2119.xml"?> here
-        (for I-Ds: include="reference.I-D.narten-iana-considerations-rfc2434bis.xml")
-
-     Both are cited textually in the same manner: by using xref elements.
-     If you use the PI option, xml2rfc will, by default, try to find included files in the same
-     directory as the including file. You can also define the XML_LIBRARY environment variable
-     with a value containing a set of directories to search.  These can be either in the local
-     filing system or remote ones accessed by http (http://domain/dir/... ).-->
-
     <references title="Normative References">
       <!-- Key words for use in RFCs to Indicate Requirement Levels -->
-      &RFC2119;
+      <?rfc include="reference.RFC.2119.xml"?>
 
       <!-- INTERNET MESSAGE ACCESS PROTOCOL - VERSION 4rev1 -->
-      &RFC3501;
+      <?rfc include="reference.RFC.3501.xml"?>
 
       <!-- Guidelines for Writing RFC Text on Security Considerations -->
-      &RFC3552;
+      <?rfc include="reference.RFC.3552.xml"?>
 
       <!-- Augmented BNF for Syntax Specifications: ABNF -->
-      &RFC4234;
+      <?rfc include="reference.RFC.4234.xml"?>
 
       <!-- Collected Extensions to IMAP4 ABNF -->
-      &RFC4466;
+      <?rfc include="reference.RFC.4466.xml"?>
 
       <!-- IMAP Extension for Conditional STORE -->
-      &RFC4551;
+      <?rfc include="reference.RFC.4551.xml"?>
 
       <!-- Guidelines for Writing an IANA Considerations Section in RFCs -->
-      &RFC5226;
+      <?rfc include="reference.RFC.5226.xml"?>
 
       <!-- Internet Message Access Protocol - SORT and THREAD Extensions -->
-      &RFC5256;
+      <?rfc include="reference.RFC.5256.xml"?>
 
       <!-- Internet Message Format -->
-      &RFC5322;
+      <?rfc include="reference.RFC.5322.xml"?>
 
-      <reference anchor="draft-MOVE">
-        <front>
-          <title>Internet Message Access Protocol (IMAP) - MOVE extension</title>
+      <!-- Internet Message Access Protocol (IMAP) - MOVE extension -->
+      <?rfc include="reference.I-D.draft-krecicki-imap-move-01.xml"?>
 
-          <author initials="W." surname="Krecicki">
-            <organization></organization>
-          </author>
-
-          <date year="2010" />
-        </front>
-	<format type="HTML" target="http://tools.ietf.org/id/draft-krecicki-imap-move-00.html"/>
-	<format type="TXT" target="http://tools.ietf.org/id/draft-krecicki-imap-move-00.txt"/>
-      </reference>
-
-        <!-- the following is the minimum to make xml2rfc happy -->
-	<!--
-      <reference anchor="min_ref">
-
-        <front>
-          <title>Minimal Reference</title>
-
-          <author initials="authInitials" surname="authSurName">
-            <organization></organization>
-          </author>
-
-          <date year="2006" />
-        </front>
-      </reference>
-      -->
     </references>
-
-    <!--
-    <references title="Informative References">
-    </references>
-    -->
 
   </back>
 </rfc>
