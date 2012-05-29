@@ -1,0 +1,106 @@
+
+* APPENDing a new message automatically chooses a CID just like local
+delivery
+	and creates or updates the conversation, including bumping the
+	conversation's modseq.
+DONE
+
+* COPYing a message to a mailbox owned by the same userid as the 
+	source mailbox keeps the CID, otherwise a new one is assigned.
+DONE
+
+* EXPUNGEing a message updates the conversation's modseq
+
+* DELETEing a folder updates all the conversations of messages in the
+folder
+
+* RENAMEing a folder preserves the per-folder conversation counters
+
+* CIDs cannot be changed by the client but are not quite completely
+	immutable either - sometimes two or more conversations need to
+	be joined into onek, due to unexpected order of arrival of mail
+	messages.  The server chooses a new CID (either from the CIDs of
+	the conversations to be joined, or brand new one) and changes
+	the CID attribute of the messages in-place.
+
+
+* ditto XMOVE <---- TODO: check this
+DONE
+
+* Not every mailbox need have conversations enabled
+DONE
+
+* New FETCH item CID returns the message's CID as an atom or NIL.
+DONE
+
+* New FETCH item FOLDER returns an <astring> representing the name
+	of the folder containing the message.
+DONE
+
+* New FETCH item UIDVALIDITY returns <nz-number> representing the
+	uidvalidity of the folder containing the message.
+DONE
+
+* Renaming a user renames conversations.  Conversations are scoped to
+the user.
+
+* New STATUS item XCONVEXISTS returns the count of conversations which
+	have messages in this folder
+DONE
+
+* New STATUS item XCONVUNSEEN returns the count of conversations
+	with messages in this folder, which have at least one message
+	without the \Seen flag (note that the unseen message might
+	be in a different folder)
+DONE
+
+* New STATUS item XCONVMODSEQ returns the highest modseq of
+	any conversation which has a message in this folder.
+DONE
+
+*  => conversations have a modseq
+DONE
+
+* New SEARCH key CONVFLAG <flagname> matches messages whose
+	conversation has at least one message with the given flag.
+	Note: only works if the the flag is set up beforehand in
+	the conversations_counted_flags imapd.conf option.
+
+* New SEARCH key CONVREAD matches messages whose conversations
+	are entirely seen, i.e. every message in the conversation
+	has the \Seen flag.
+
+* New SEARCH key CONVSEEN is a synonym for CONVREAD
+
+* New SEARCH key CONVUNREAD matches messages whose conversations
+	are not entirely seen, i.e. at least one message in the
+	conversation does not have the \Seen flag.
+
+* New SEARCH key CONVUNSEEN is a synonym for CONVUNREAD
+
+* New SEARCH key CONVMODSEQ <modseq> matches any message whose
+	conversation has a modseq value greater than or equal
+	to the given <modseq>
+
+* New SORT key HASFLAG <astring> sorts messages which do not have
+	the given flag before messages which do have the given flag
+
+* New SORT key CONVMODSEQ sorts messages whose conversations have
+	a smaller modseq value before messages whose conversations
+	have a larger modseq value.
+
+* New SORT key CONVEXISTS sorts messages whose conversations have
+	fewer existing messages before messages whose conversations
+	have more existing messages.
+
+* New SORT key HASCONVFLAG <astring> sorts messages whose conversation
+	contains no messages with the given flag before messages whose
+	conversation contains any messages with the given flag.
+	Note: only works if the the flag is set up beforehand in
+	the conversations_counted_flags imapd.conf option.
+
+* => sort on ANNOTATION, MODSEQ, HASFLAG, CONVMODSEQ, CONVEXISTS,
+HASCONVFLAG
+	are considered *mutable*, likewise for search
+
+

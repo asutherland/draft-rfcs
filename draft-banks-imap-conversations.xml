@@ -183,20 +183,62 @@
       <section anchor="Properties" title="Conversation Properties">
 
 	<t>In addition to being groups of messages, conversations are
-	also first class objects with some persistent properties of
-	their own.  These properties are maintained automatically by the
-	server, and are read-only to the client.
-	<list style="symbols">
+	also first class objects with some properties of their own.
+	These properties are maintained automatically by the server, and
+	are read-only to the client.  The client can query conversation
+	properties using the <xref target="XCONVMETA">XCONVMETA</xref>
+	command.</t>
 
-	<t>A list of folders containing messages which are in the
-	conversation, known as FOLDERS.</t>
-	<t>A list of addresses from which messages in the conversation
-	have been sent, known as SENDERS.</t>
-	<t>A modseq value.</t>
-	<t>Several counters which track how many messages in the
-	conversation are in various states.</t>
+	<t>With the exception of <!-- CID and --> MODSEQ, these properties are
+	summaries of properties of the messages contained in the
+	conversation, provided for the convenience of
+	conversations-aware clients.  A server MAY implement them
+	dynamically rather than pre-calculating and storing them,
+	although pre-calculating is recommended for best performance as
+	visible to the user.</t>
 
-	<!-- TODO: really only MODSEQ is not derived from the messages -->
+	<t>Conversation properties include at least:
+	<list style="hanging">
+
+	<!-- 
+	<t hangText="CID"><vspace blankLines="0"/>The Conversation ID of
+	the conversation.</t>
+	-->
+
+	<t hangText="MODSEQ"><vspace blankLines="0"/>Reflects the
+	highest MODSEQ value of any message which has ever been
+	associated with the conversation, including messages since
+	deleted.  This is analagous with the HIGHESTMODSEQ property of
+	folders.  Note that this means that the server MUST maintain the
+	MODSEQ property persistently.</t>
+
+	<!-- TODO: should have called this HIGHESTMODSEQ -->
+
+	<t hangText="EXISTS"><vspace blankLines="0"/>A count of the
+	number of messages in the conversation.</t>
+
+	<t hangText="UNSEEN"><vspace blankLines="0"/>A count of the
+	number of messages in the conversation which do not have
+	the \Seen flag set.</t>
+
+	<t hangText="COUNT"><vspace blankLines="0" />A set of
+	(FLAG COUNT) pairs which count the number of messages in the
+	conversation which have various flags (user or system flags)
+	set.  Which flags are so counted is not defined here.  The
+	server MAY choose any set of flags to count, but it SHOULD
+	include \Draft and \Flagged flags.</t>
+
+	<t hangText="SENDERS"><vspace blankLines="0"/>A list of
+	addresses, reported as broken-out tuples (NAME ROUTE MAILBOX
+	DOMAIN), from which messages in the conversation have been
+	sent.</t>
+
+	<t hangText="FOLDEREXISTS"><vspace blankLines="0"/>A list of folders
+	containing messages which are in the conversation, with counts
+	of the number of messages from this conversation in each folder.
+	Reported as (MBOXNAME EXISTS) tuples.</t>
+
+	<!-- TODO: should have called this FOLDERS? -->
 
 	</list>
 	</t>
@@ -223,6 +265,9 @@
 	  Subject header field, or limiting the length of conversations.
 	  </t>
 
+	  <!-- TODO: separate section with Guidelines on
+	  Message/Conversation Joining -->
+
 	  <t>Depending on how many conversations were found, the server
 	  MUST take one of these actions to choose a single
 	  conversation.
@@ -239,20 +284,22 @@
 	    create a single resulting conversation and uses that.</t>
 
 	  </list>
-	  The server sets the message's CID attribute to the CID of
-	  the chosen conversation, and updates the conversation state to
-	  account for the message.</t>
+	  The server MUST set the message's CID attribute to the CID of
+	  the chosen conversation, and MUST update the conversation's
+	  SENDERS, FOLDERS, and counter information to account for the
+	  message.</t>
+
+	<t>At this point, the server MAY split the final conversation to
+	enforce some server-specific limit on conversation size.</t>
 
 	</list></t>
       </section>
       <section anchor="Merging" title="Merging Conversations">
 
 	<t>The server MUST, under some rare circumstances, be able to
-	merge two or more conversations together.</t>
-
-	<t>One simple example is when particular combinations of
-	messages arrive out of order.  Imagine three messages like
-	this:</t>
+	merge two or more conversations together One simple example is
+	when particular combinations of messages arrive out of order.
+	Imagine three messages like this:</t>
 
 	<figure>
 	  <artwork type="ascii">
@@ -283,47 +330,50 @@ Subject: Re: Re: Hello World
 	<t>When the server decides that a newly inserted message
 	belongs in two or more conversations, it MUST merge those two
 	conversations together into one larger conversation.  However
-	the server MAY split those conversations again to enforce a
-	limit on conversation size.</t>
+	the server MAY split those conversations again to enforce some
+	server specific size limit on conversations.</t>
 
 	<!-- TODO: defending against malicious conversation joining -->
 
-	<t>Merging a conversations involves the following steps.
+	<t>Merging a conversations involves at least the following steps.
 	<list style="symbols">
 
 	  <t>The server chooses a final conversation.  The server SHOULD
 	  choose one of the existing conversations rather than create an
 	  entirely new conversation.</t>
 
-	  <t>The server MUST re-associate the messages in all the
+	  <t>The server MUST associate the messages in all the
 	  conversations to be merged, with the final conversation.  In
 	  the case that the message is already in the final
-	  conversation, this is a no-op.  In the case that the message
-	  is in another conversation, the server MUST update the
+	  conversation, this MAY be a no-op.  In the case that the
+	  message is in another conversation, the server MUST update the
 	  message's CID property and increase the message's MODSEQ
 	  value.</t>
 
-	  <t>The server MUST merge the FOLDERS and SENDERS information,
-	  and any counters from all the conversations into the final
-	  conversation.</t>
+	  <t>The server MUST update the final conversation's MODSEQ
+	  value to be the highest of all the MODSEQ values of the
+	  messages in the conversation.</t>
 
-	  <!-- TODO: convmodseq -->
-
-	  <t>Finally the server MUST delete the non-final conversations,
+	  <t>The server MUST delete the non-final conversations,
 	  so that they are not visible again from any IMAP command.
 	  The server MAY re-use the CID for an entirely new conversation
 	  at some time in the future.</t>
 
 	</list></t>
 
+	<t>After the conversations have been merged, every message in
+	the original conversations MUST be associated with the final
+	conversation.  The SENDERS, FOLDERS and counter information in
+	the final conversations must be a union of the respective
+	information in the original conversations.</t>
+
+	<t>At this point, the server MAY split the final conversation to
+	enforce some server-specific limit on conversation size.</t>
+
       </section>
     </section>
     <section anchor="ProtocolChanges" title="IMAP Protocol Changes">
       <section anchor="General" title="General Considerations">
-      </section>
-      <section anchor="FETCH_Command" title="New Message Data Items in FETCH Command">
-      </section>
-      <section anchor="FETCH_Response" title="New Message Data Items in FETCH Response">
       </section>
       <section anchor="Delivery" title="Interaction with Message Delivery">
 
@@ -333,20 +383,6 @@ Subject: Re: Re: Hello World
 	<!-- reference to SMTP. LMTP -->
 
       </section>
-      <section anchor="COPY" title="Interaction with COPY">
-
-	<t>When a message is added to a folder using the COPY command, the
-	server MUST associate the message with a conversation as described
-	in <xref target="Inserting" />.</t>
-
-	<t>Note that if a message is copied to a folder in the same
-	conversation scope as the original folder, the new message SHOULD
-	end up in the same conversation as the original.</t>
-
-	<t>TODO: exception: the server MAY split conversations which are
-	too large.</t>
-
-      </section>
       <section anchor="APPEND" title="Interaction with APPEND">
 
 	<t>When a message is added to the server using the APPEND command,
@@ -354,21 +390,33 @@ Subject: Re: Re: Hello World
 	described in <xref target="Inserting" />.</t>
 
       </section>
+      <section anchor="COPY" title="Interaction with COPY">
+
+	<t>When a message is added to a folder using the COPY command, the
+	server MUST associate the message with a conversation as described
+	in <xref target="Inserting" />.</t>
+
+	<t>Note that if a message is copied to a folder in the same
+	conversation scope as the original folder, the server SHOULD
+	associate the new message with the same conversation as the
+	original, except that the server MAY split conversations which
+	exceed some server-specific size limit</t>
+
+      </section>
       <section anchor="MOVE" title="Interaction with MOVE">
 
 	<t>A server MAY implement both this extension and the MOVE
 	extension <xref target="I-D.krecicki-imap-move"/>.</t>
 
-	<t>When a message is moved from one folder to another folder in
-	the same conversation scope using the MOVE command, the server
-	MUST preserve the association between the message and it's
-	conversation.</t>
+	<t>When a message is moved from a folder to another folder in
+	the same conversation scope, the server MUST preserve the
+	association between the message and it's conversation.</t>
 
-	<t>When a message is moved from one folder to a folder in a
-	different conversation scope using the MOVE command, the server
-	MUST drop any association between the message and a conversation
-	and associate the message with a conversation in the new scope
-	as described in <xref target="Inserting" />.</t>
+	<t>When a message is moved from a folder to another folder in a
+	different conversation scope, the server MUST drop any
+	association between the message and a conversation and associate
+	the message with a conversation in the new scope as described in
+	<xref target="Inserting" />.</t>
 
       </section>
       <section anchor="EXPUNGE" title="Interaction with EXPUNGE">
@@ -377,19 +425,150 @@ Subject: Re: Re: Hello World
       </section>
       <section anchor="DELETE" title="Interaction with STORE">
       </section>
+      <section anchor="FETCH" title="New Data Items for FETCH">
+
+	<t>This extension adds the following data items to the FETCH command
+	and the FETCH untagged response.
+	<list style="hanging">
+	
+	<t hangText="CID"><vspace blankLines="0"/>The Conversation ID of
+	the message.</t>
+
+	<t hangText="FOLDER"><vspace blankLines="0"/>The name of the
+	folder containing the message.  This is not very useful in the
+	FETCH command, as all the messages are in the same folder.
+	However it is useful for the new <xref
+	target="XCONVFETCH">XCONVFETCH</xref> command which uses the
+	same &lt;fetch-att&gt; syntax as FETCH.</t>
+
+	<t hangText="UIDVALIDITY"><vspace blankLines="0"/>The
+	UIDVALIDITY value of the folder containing the message.  Again,
+	this is only useful for the new <xref
+	target="XCONVFETCH">XCONVFETCH</xref> command.</t>
+
+	</list></t>
+
+      </section>
       <section anchor="SEARCH" title="New Criteria in SEARCH">
       </section>
       <section anchor="SORT" title="New Keys in SORT">
       </section>
-      <section anchor="STATUS" title="New Items in STATUS">
+      <section anchor="STATUS" title="New Data Items in STATUS">
+
+	<t>This extension adds the following data items to the STATUS
+	command and the STATUS untagged response.
+	<list style="hanging">
+	
+	<t hangText="XCONVEXISTS"><vspace blankLines="0"/>The number of
+	conversations which have messages in this folder.</t>
+
+	<t hangText="XCONVUNSEEN"><vspace blankLines="0"/>The number of
+	conversations with messages in this folder, which have at least
+	one message without the \Seen flag set (note that such messages
+	might be in a different folder).</t>
+
+	<t hangText="XCONVMODSEQ"><vspace blankLines="0"/>The highest
+	MODSEQ value of any conversation which is associated with a
+	message in this folder.  Note that this is in general greater
+	than or equal to the folder's HIGHESTMODSEQ value.</t>
+
+	</list></t>
+
+	<t>Note that these status data items all report summaries of
+	properties of the messages associated with conversations which
+	are associated with a message in this folder, provided for the
+	convenience of conversations-aware clients.  A server MAY
+	implement them dynamically rather than pre-calculating and
+	storing them, although pre-calculating is recommended for best
+	performance as visible to the user.</t>
+
+	<!-- define the phrase "the conversation touches the folder" -->
+
       </section>
       <section anchor="XCONVMETA" title="New Command XCONVMETA">
+
+	<!-- TODO: should have called this XCONVSTATUS -->
+
+	<t><list style="hanging" hangIndent="20">
+
+	<t hangText="Arguments:">cid list<vspace blankLines="0"/>
+	conversation data items (one or more)</t>
+		   
+	<t hangText="Data:">untagged responses: XCONVMETA</t>
+
+	<t hangText="Result:">OK - request completed<vspace blankLines="0"/>
+	NO - request error: no such conversation<vspace blankLines="0"/>
+	BAD - command unknown or arguments invalid</t>
+
+	</list></t>
+
+	<t>This extension adds the XCONVMETA command, which can be used
+	by clients to query the state of a conversation.  See <xref
+	target="Properties"/> for a description of the data items which
+	can be queried.</t>
+
       </section>
       <section anchor="XCONVFETCH" title="New Command XCONVFETCH">
+
+	<t><list style="hanging" hangIndent="20">
+
+	<t hangText="Arguments:">cid list<vspace blankLines="0"/>
+	unchanged-since modseq<vspace blankLines="0"/>
+	fetch data items (one or more)</t>
+		   
+	<t hangText="Data:">untagged responses: FETCH</t>
+
+	<t hangText="Result:">OK - request completed<vspace blankLines="0"/>
+	NO - request error: no such conversation<vspace blankLines="0"/>
+	BAD - command unknown or arguments invalid</t>
+
+	</list></t>
+
+	<t>This extension adds the XCONVFETCH command, which can be used
+	by clients to query the messages in a conversation.</t>
+
       </section>
       <section anchor="XCONVSORT" title="New Command XCONVSORT">
+
+	<t><list style="hanging" hangIndent="20">
+
+	<t hangText="Arguments:">sort criteria (zero or more)<vspace blankLines="0"/>
+	window arguments<vspace blankLines="0"/>
+	search criteria (one or more)</t>
+		   
+	<t hangText="Data:">untagged responses: TODO</t>
+
+	<t hangText="Result:">OK - request completed<vspace blankLines="0"/>
+	NO - request error: no such conversation<vspace blankLines="0"/>
+	BAD - command unknown or arguments invalid</t>
+
+	</list></t>
+
+	<t>This extension adds the XCONVSORT command, which can be used
+	by clients to list the conversations in a folder.</t>
+
       </section>
       <section anchor="XCONVUPDATES" title="New Command XCONVUPDATES">
+
+	<t><list style="hanging" hangIndent="20">
+
+	<t hangText="Arguments:">sort criteria (zero or more)<vspace blankLines="0"/>
+	window arguments<vspace blankLines="0"/>
+	search criteria (one or more)</t>
+		   
+	<t hangText="Data:">untagged responses: ADDED,CHANGED,REMOVED TODO</t>
+
+	<t hangText="Result:">OK - request completed<vspace blankLines="0"/>
+	NO - request error: no such conversation<vspace blankLines="0"/>
+	BAD - command unknown or arguments invalid</t>
+
+	</list></t>
+
+	<t>This extension adds the XCONVUPDATES command, which can be used
+	by clients to discover changes in a folder since some arbitrary
+	state in the past.</t>
+	<!-- TODO: should this command be optional? -->
+
       </section>
     </section>
     <section anchor="Syntax" title="Formal Syntax">
@@ -419,12 +598,12 @@ command-select =/ convsort / convupdates
 ;    ;; sort-criteria defined in RFC5256
 ;    ;; search-criteria defined in RFC5256, includes initial charset
 ;
-;convsort-windowargs = '(' convsort-windowarg
-;                       (SP convsort-windowarg)* ')'
+;convsort-windowargs = "(" convsort-windowarg
+;                       (SP convsort-windowarg)* ")"
 ;
 ;convsort-windowarg = "CONVERSATIONS" /
-;                     "POSITION" SP '(' nz-number SP number ')' /
-;                     "ANCHOR" SP '(' uniqueid SP number SP number ')'
+;                     "POSITION" SP "(" nz-number SP number ")" /
+;                     "ANCHOR" SP "(" uniqueid SP number SP number ")"
 ;                        ;; position limit
 ;                        ;; anchor offset limit
 ;
@@ -433,18 +612,83 @@ command-select =/ convsort / convupdates
 ;    ;; sort-criteria defined in RFC5256
 ;    ;; search-criteria defined in RFC5256, includes initial charset
 ;
-;convupdates-windowargs = '(' convupdates-windowarg
-;                             (SP convupdates-windowarg)* ')'
+;convupdates-windowargs = "(" convupdates-windowarg
+;                             (SP convupdates-windowarg)* ")"
 ;
 ;convupdates-windowarg = "CONVERSATIONS" /
-;                        "CHANGEDSINCE" SP '('
+;                        "CHANGEDSINCE" SP "("
 ;                            mod-sequence-value SP ;; highestmodseq
-;                            uniqueid ')' /        ;; uidnext
-;                        "UPTO" SP '(' uniqueid ')'
+;                            uniqueid ")" /        ;; uidnext
+;                        "UPTO" SP "(" uniqueid ")"
 ;    ;; mod-sequence-value is defined in RFC4551
 ;    ;; number and nz-number are defined in RFC3501
 ;
-;;; Note: CHANGEDSINCE is mandatory for xconvupdates]]></artwork>
+;;; Note: CHANGEDSINCE is mandatory for xconvupdates
+
+convmeta = "XCONVMETA" SP cid-list SP conv-atts
+
+;; TODO: which conversation scope are we getting
+;; with XCONVMETA and XCONVFETCH?
+
+cid-list = cid / "(" cid *(SP cid) ")"
+
+conv-atts = conv-att / "(" conv-att *(SP conv-att) ")"
+
+conv-att = "EXISTS" /
+           "UNSEEN" /
+           "COUNT" SP flag-list /
+           "SENDERS" /
+           "FOLDEREXISTS" SP "(" mailbox *(SP mailbox) ")"
+
+;; TODO: this appends not to <response-data>  but to the middle
+;; part of it, MEH
+;; response-data   = "*" SP (resp-cond-state / resp-cond-bye /
+;;                  mailbox-data / message-data / capability-data) CRLF
+
+response-data =/ conv-data
+
+conv-data = "XCONVMETA" SP cid
+          (conv-data-item / "(" conv-data-item *(SP conv-data-item) ")")
+
+conv-data-item = "MODSEQ" SP mod-sequence-value /
+                 "EXISTS" SP nz-number /
+                 "UNSEEN" SP number /
+                 "COUNT" SP conv-count-list /
+                 "SENDERS" SP "(" 1*address ")" /
+                 "FOLDEREXISTS" SP conv-folder-list
+
+conv-count-list = conv-count-item /
+		  "(" conv-count-item *(SP conv-count-item) ")"
+
+conv-folder-list = conv-folder-item /
+		  "(" conv-folder-item *(SP conv-folder-item) ")"
+
+conv-count-item = flag SP number
+
+conv-folder-item = mailbox SP number
+;; TODO describe this better
+
+;; TODO: specify what happens if the client requests a count
+;; for a flag ;; we do not count
+
+;; TODO: almost all these rules are incorrect about whether
+;; zero-length lists of things are acceptable
+
+fetch-att =/ "CID" / "FOLDER" / "UIDVALIDITY"
+
+msg-att-dynamic =/ "CID" SP cid /
+                   "UIDVALIDITY" SP nz-number
+
+msg-att-static =/ "FOLDER" SP mailbox
+
+status-att =/ "XCONVEXISTS" / "XCONVUNSEEN" / "XCONVMODSEQ"
+
+convfetch = "XCONVFETCH" SP cid-list SP mod-sequence-value SP
+            (fetch-att / "(" fetch-att *(SP fetch-att) ")")
+
+;; TODO: xconvfetch always returns the FOLDER and UIDVALIDITY items
+
+]]></artwork>
       </figure>
 
     </section>
