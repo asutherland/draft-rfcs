@@ -593,37 +593,37 @@ command-auth =/ convfetch / convmeta
 
 command-select =/ convsort / convupdates
 
-;convsort = "XCONVSORT" SP sort-criteria
-;           [SP convsort-windowargs] SP search-criteria
-;    ;; sort-criteria defined in RFC5256
-;    ;; search-criteria defined in RFC5256, includes initial charset
-;
-;convsort-windowargs = "(" convsort-windowarg
-;                       (SP convsort-windowarg)* ")"
-;
-;convsort-windowarg = "CONVERSATIONS" /
-;                     "POSITION" SP "(" nz-number SP number ")" /
-;                     "ANCHOR" SP "(" uniqueid SP number SP number ")"
-;                        ;; position limit
-;                        ;; anchor offset limit
-;
-;convupdates = "XCONVUPDATES" SP sort-criteria
-;               SP convupdates-windowargs SP search-criteria
-;    ;; sort-criteria defined in RFC5256
-;    ;; search-criteria defined in RFC5256, includes initial charset
-;
-;convupdates-windowargs = "(" convupdates-windowarg
-;                             (SP convupdates-windowarg)* ")"
-;
-;convupdates-windowarg = "CONVERSATIONS" /
-;                        "CHANGEDSINCE" SP "("
-;                            mod-sequence-value SP ;; highestmodseq
-;                            uniqueid ")" /        ;; uidnext
-;                        "UPTO" SP "(" uniqueid ")"
-;    ;; mod-sequence-value is defined in RFC4551
-;    ;; number and nz-number are defined in RFC3501
-;
-;;; Note: CHANGEDSINCE is mandatory for xconvupdates
+convsort = "XCONVSORT" SP sort-criteria
+           [SP convsort-windowargs] SP search-criteria
+    ;; sort-criteria defined in RFC5256
+    ;; search-criteria defined in RFC5256, includes initial charset
+
+convsort-windowargs = "(" convsort-windowarg
+                       *(SP convsort-windowarg) ")"
+
+convsort-windowarg = "CONVERSATIONS" /
+                     "POSITION" SP "(" nz-number SP number ")" /
+                     "ANCHOR" SP "(" uniqueid SP number SP number ")"
+                        ;; position limit
+                        ;; anchor offset limit
+
+convupdates = "XCONVUPDATES" SP sort-criteria
+               SP convupdates-windowargs SP search-criteria
+    ;; sort-criteria defined in RFC5256
+    ;; search-criteria defined in RFC5256, includes initial charset
+
+convupdates-windowargs = "(" convupdates-windowarg
+                             *(SP convupdates-windowarg) ")"
+
+convupdates-windowarg = "CONVERSATIONS" /
+                        "CHANGEDSINCE" SP "("
+                            mod-sequence-value SP ;; highestmodseq
+                            uniqueid ")" /        ;; uidnext
+                        "UPTO" SP "(" uniqueid ")"
+    ;; mod-sequence-value is defined in RFC4551
+    ;; number and nz-number are defined in RFC3501
+
+;; Note: CHANGEDSINCE is mandatory for xconvupdates
 
 convmeta = "XCONVMETA" SP cid-list SP conv-atts
 
