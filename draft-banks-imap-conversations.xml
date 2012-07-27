@@ -35,19 +35,19 @@
     Protocol Version 4 - Extension for Conversations</title>
 
     <author fullname="Greg Banks" initials="G.B." role="editor"
-            surname="Banks">
+	    surname="Banks">
       <organization>Opera Software Australia Pty. Ltd.</organization>
 
       <address>
-        <postal>
-          <street>Level 1, 91 William St</street>
-          <city>Melbourne</city>
-          <region>Victoria</region>
-          <code>3000</code>
-          <country>Australia</country>
-        </postal>
+	<postal>
+	  <street>Level 1, 91 William St</street>
+	  <city>Melbourne</city>
+	  <region>Victoria</region>
+	  <code>3000</code>
+	  <country>Australia</country>
+	</postal>
 
-        <email>gnb@opera.com</email>
+	<email>gnb@opera.com</email>
 
       </address>
     </author>
@@ -82,10 +82,10 @@
 	<t>In examples, "C:" and "S:" indicate lines sent by the client
 	and server, respectively.</t>
 
-        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-        "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-        document are to be interpreted as described in <xref
-        target="RFC2119">RFC 2119</xref>.</t>
+	<t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+	"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+	document are to be interpreted as described in <xref
+	target="RFC2119">RFC 2119</xref>.</t>
       </section>
     </section>
 
@@ -430,7 +430,7 @@ Subject: Re: Re: Hello World
 	<t>This extension adds the following data items to the FETCH command
 	and the FETCH untagged response.
 	<list style="hanging">
-	
+
 	<t hangText="CID"><vspace blankLines="0"/>The Conversation ID of
 	the message.</t>
 
@@ -458,7 +458,7 @@ Subject: Re: Re: Hello World
 	<t>This extension adds the following data items to the STATUS
 	command and the STATUS untagged response.
 	<list style="hanging">
-	
+
 	<t hangText="XCONVEXISTS"><vspace blankLines="0"/>The number of
 	conversations which have messages in this folder.</t>
 
@@ -493,7 +493,7 @@ Subject: Re: Re: Hello World
 
 	<t hangText="Arguments:">cid list<vspace blankLines="0"/>
 	conversation data items (one or more)</t>
-		   
+
 	<t hangText="Data:">untagged responses: XCONVMETA</t>
 
 	<t hangText="Result:">OK - request completed<vspace blankLines="0"/>
@@ -515,7 +515,7 @@ Subject: Re: Re: Hello World
 	<t hangText="Arguments:">cid list<vspace blankLines="0"/>
 	unchanged-since modseq<vspace blankLines="0"/>
 	fetch data items (one or more)</t>
-		   
+
 	<t hangText="Data:">untagged responses: FETCH</t>
 
 	<t hangText="Result:">OK - request completed<vspace blankLines="0"/>
@@ -535,7 +535,7 @@ Subject: Re: Re: Hello World
 	<t hangText="Arguments:">sort criteria (zero or more)<vspace blankLines="0"/>
 	window arguments<vspace blankLines="0"/>
 	search criteria (one or more)</t>
-		   
+
 	<t hangText="Data:">untagged responses: TODO</t>
 
 	<t hangText="Result:">OK - request completed<vspace blankLines="0"/>
@@ -555,7 +555,7 @@ Subject: Re: Re: Hello World
 	<t hangText="Arguments:">sort criteria (zero or more)<vspace blankLines="0"/>
 	window arguments<vspace blankLines="0"/>
 	search criteria (one or more)</t>
-		   
+
 	<t hangText="Data:">untagged responses: ADDED,CHANGED,REMOVED TODO</t>
 
 	<t hangText="Result:">OK - request completed<vspace blankLines="0"/>
@@ -658,10 +658,10 @@ conv-data-item = "MODSEQ" SP mod-sequence-value /
                  "FOLDEREXISTS" SP conv-folder-list
 
 conv-count-list = conv-count-item /
-		  "(" conv-count-item *(SP conv-count-item) ")"
+                  "(" conv-count-item *(SP conv-count-item) ")"
 
 conv-folder-list = conv-folder-item /
-		  "(" conv-folder-item *(SP conv-folder-item) ")"
+                  "(" conv-folder-item *(SP conv-folder-item) ")"
 
 conv-count-item = flag SP number
 
