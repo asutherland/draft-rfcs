@@ -34,9 +34,8 @@
     <title abbrev="IMAP4 - Conversations">Internet Message Access
     Protocol Version 4 - Extension for Conversations</title>
 
-    <author fullname="Greg Banks" initials="G.B." role="editor"
-	    surname="Banks">
-      <organization>Opera Software Australia Pty. Ltd.</organization>
+    <author fullname="Greg Banks" initials="G." role="editor" surname="Banks">
+      <organization abbrev="OSA">Opera Software Australia Pty. Ltd.</organization>
 
       <address>
 	<postal>
@@ -50,6 +49,12 @@
 	<email>gnb@opera.com</email>
 
       </address>
+    </author>
+    <author fullname="Robert Mueller" initials="R." surname="Mueller">
+      <organization abbrev="OSA">Opera Software Australia Pty. Ltd.</organization>
+    </author>
+    <author fullname="Bron Gondwana" initials="B." surname="Gondwana">
+      <organization abbrev="OSA">Opera Software Australia Pty. Ltd.</organization>
     </author>
 
     <date year="2012" month="May" day="28"/>
